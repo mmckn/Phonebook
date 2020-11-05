@@ -5,6 +5,7 @@ const app = express()
 const cors = require('cors')
 app.use(cors())
 
+app.use(express.static('build'))
 //json parser takse JSON date of a request and converts it to JavaScript
 //and attaches it to request.body
 app.use(express.json())
