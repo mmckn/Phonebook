@@ -1,6 +1,11 @@
+
+require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
 const app = express()
+
+const Person = require('./models/person')
+
 //allows our frontend app to access this server
 const cors = require('cors')
 app.use(cors())
@@ -35,7 +40,7 @@ let persons = [
     }
   ]
 
-  let numberofentries = persons.length
+  let numberofentries = Person.length - 1
   let date = new Date()
 
   app.get('/', (request, response) =>{
@@ -43,7 +48,9 @@ let persons = [
   })
 
   app.get('/api/persons', (request, response) => {
-      response.json(persons)
+     Person.find({}).then(people =>{
+       response.json(people)
+     })
   })
 
   app.get('/info', (request, response) => {
@@ -54,15 +61,10 @@ ${date} `)
 
   //get an entry from the phonebook by id
   app.get('/api/persons/:id', (request, response) =>{
-    const id = Number(request.params.id)
-    const person = persons.find(person => person.id === id)
-    if(person){
+    Person.findById(request.params.id).then(person => {
       response.json(person)
-    }
-      else{
-        response.status(400).end()
-      }
-    }
+    })
+  }
   )
 
 //delete an entry from the phonebook
@@ -73,50 +75,42 @@ ${date} `)
   })
 
 
-const generateId = () => {
-  const maxId = persons.length > 0 
-  ? Math.max(...persons.map(p => p.id))
-  :0
 
-  return maxId + 1
-}
 
   //add a new entry to the phonebook
   app.post('/api/persons', (request, response) => {
     const body = request.body
+
     console.log(body)
-    if(!body.name){
+    if(body.content === undefined){
       return response.status(400).json({
         
-        error: 'name missing'
+        error: 'content missing'
       })
     }
 
-    
-    if(!body.number){
-      return response.status(400).json({
 
-        error: 'number missing'
-      })
-    }
-
-    if(persons.filter(p => p.name == body.name).length >0)
+    /*if(persons.filter(p => p.name == body.name).length >0)
     {
       return response.status(400).json({
         error:"This person is already in the phonebook"
       })
-    }
+    }*/
 
-    const person ={
-      id: generateId(),
+
+    
+    const person = new Person({
+     
       name: body.name,
        number:body.number,
         
-    }
+    })
 
-    persons = persons.concat(person)
-console.log(persons)
-    response.json(person)
+    
+person.save().then(savedPerson => {
+  response.json(savedPerson)
+})
+ 
 
   })
   
