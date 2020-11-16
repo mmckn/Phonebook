@@ -10,7 +10,7 @@ var fetch = require('node-fetch');
 const url =''
 
 
-
+app.use(express.static('build'))
 
 
 console.log(fetch)
@@ -21,7 +21,7 @@ const Person = require('./models/person')
 const cors = require('cors')
 app.use(cors())
 
-app.use(express.static('build'))
+
 //json parser takse JSON date of a request and converts it to JavaScript
 //and attaches it to request.body
 app.use(express.json())
@@ -47,12 +47,13 @@ app.use(morgan(':person :method :url :response-time'))
   })
 
   app.get('/api/persons', (request, response) => {
+    console.log('hello')
      Person.find({}).then(people =>{
        response.json(people)
      })
   })
 
-  app.get('/info', (request, response) => {
+  app.get('/api/persons/info', (request, response) => {
 response.send(`Phonebook has info for ${numberofentries} people. <br>
 <br>
 ${date} `)
