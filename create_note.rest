@@ -1,4 +1,4 @@
-get http://localhost:3001/api/persons/info
+put https://cryptic-fortress-05104.herokuapp.com/
 Content-Type: application/json
 
 {
