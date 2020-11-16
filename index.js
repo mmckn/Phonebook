@@ -1,8 +1,19 @@
 
+
 require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
 const app = express()
+var fetch = require('node-fetch');
+
+
+const url =''
+
+
+
+
+
+console.log(fetch)
 
 const Person = require('./models/person')
 
@@ -17,6 +28,13 @@ app.use(express.json())
 
 //create a new morgan token that gets the request.body
 morgan.token('person', function (req, res) { return JSON.stringify(req.body) })
+
+
+
+
+
+
+
 
 app.use(morgan(':person :method :url :response-time'))
 let persons = [
@@ -69,9 +87,12 @@ ${date} `)
 
 //delete an entry from the phonebook
   app.delete('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id)
-    persons = persons.filter(person => person.id !== id)
+    const id = request.params.id
+    console.log(id)
+    Person.findByIdAndDelete(id).then( result => {
+ 
     response.status(204).end()
+    })
   })
 
 
@@ -88,8 +109,16 @@ ${date} `)
         error: 'content missing'
       })
     }
+    const person = new Person({
+      name:body.name,
+      phoneNumber: body.phoneNumber
+    })
 
+    person.save().then(savedPerson => {
+      response.json(savedPerson)
+    })})
 
+  
     /*if(persons.filter(p => p.name == body.name).length >0)
     {
       return response.status(400).json({
@@ -99,20 +128,6 @@ ${date} `)
 
 
     
-    const person = new Person({
-     
-      name: body.name,
-       number:body.number,
-        
-    })
-
-    
-person.save().then(savedPerson => {
-  response.json(savedPerson)
-})
- 
-
-  })
   
   
   
