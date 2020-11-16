@@ -77,33 +77,24 @@ ${date} `)
 
 
   //add a new entry to the phonebook
-  app.post('/api/persons', (request, response) => {
+  app.post('/api/persons', (request, response, next) => {
     const body = request.body
 
-    console.log(body)
-    if(body.name === undefined){
-      return response.status(400).json({
-        
-        error: 'name missing'
-      })
-    }
+  
     const person = new Person({
     
       name:body.name,
       phoneNumber: body.number
     })
 
-    person.save().then(savedPerson => {
+    person.save()
+    
+    .then(savedPerson => {
       response.json(savedPerson)
-    })})
+    })
+    .catch( error => next(error))
+  })
 
-  
-    /*if(persons.filter(p => p.name == body.name).length >0)
-    {
-      return response.status(400).json({
-        error:"This person is already in the phonebook"
-      })
-    }*/
 
 app.put('/api/persons/:id', (request, response, next) => {
   const body = request.body
@@ -132,8 +123,11 @@ const errorHandler = (error, request, response, next) => {
   console.error(error.message)
   //if error is castError then it is an invalid object id for mongoDb
   if(error.name === 'CastError') {
-    return response.status(400).send({error: "id formatted incorrectly"})
+    return response.status(400).send({ error: "id formatted incorrectly" })
+  } else if (error.name === 'ValidationError') {
+    return response.status(400).json({ error: error.message })
   }
+  
   //if it is not then pass it to the default error handler
   next(error)
 }
