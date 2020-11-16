@@ -1,48 +1,16 @@
 
 
-require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
 const app = express()
-var fetch = require('node-fetch');
 
-
-const url =''
-
-
-app.use(express.static('build'))
-
-app.use(express.json())
-
-
+require('dotenv').config()
 const Person = require('./models/person')
-
-//allows our frontend app to access this server
 const cors = require('cors');
-const e = require('express');
-const { nextTick } = require('process');
-const { notEqual } = require('assert');
 app.use(cors())
 
-//If user enters an unkown URL display this
-const unknownEndpoint = ( request, response) => {
-  response.status(404).send({ error: 'unknown endpoint'})
-}
-
-app.use(unknownEndpoint)
-
-const errorHandler = (error, request, response, next) => {
-  console.error(error.message)
-  //if error is castError then it is an invalid object id for mongoDb
-  if(error.name === 'CastError') {
-    return response.status(400).send({error: "id formatted incorrectly"})
-  }
-  //if it is not then pass it to the default error handler
-  next(error)
-}
-
-app.use(errorHandler)
-
+app.use(express.json())
+app.use(express.static('build'))
 
 //json parser takse JSON date of a request and converts it to JavaScript
 //and attaches it to request.body
@@ -89,8 +57,7 @@ ${date} `)
       }
     }
     )
-    .catch(error => 
-      next(error)
+    .catch(error =>  next(error)
     )
   }
   )
@@ -138,12 +105,12 @@ ${date} `)
       })
     }*/
 
-app.put('api/persons/:id', (request, response,next) => {
+app.put('api/persons/:id', (request, response, next) => {
   const body = request.body
 
   const person = {
 name: body.name,
-phoneNumber: body.number
+phoneNumber: body.number,
   }
 
   Person.findByIdAndUpdate(request.params.id, person, {new: true})
@@ -153,6 +120,26 @@ phoneNumber: body.number
   .catch(error => next(error))
 })
     
+
+//If user enters an unkown URL display this
+const unknownEndpoint = ( request, response) => {
+  response.status(404).send({ error: 'unknown endpoint'})
+}
+
+app.use(unknownEndpoint)
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+  //if error is castError then it is an invalid object id for mongoDb
+  if(error.name === 'CastError') {
+    return response.status(400).send({error: "id formatted incorrectly"})
+  }
+  //if it is not then pass it to the default error handler
+  next(error)
+}
+
+app.use(errorHandler)
+
   
   
   
