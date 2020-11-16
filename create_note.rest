@@ -1,4 +1,4 @@
-put https://cryptic-fortress-05104.herokuapp.com/
+put https://cryptic-fortress-05104.herokuapp.com/api/persons/5fa42fec375a86673cb67112
 Content-Type: application/json
 
 {
