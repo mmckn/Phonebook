@@ -37,26 +37,7 @@ morgan.token('person', function (req, res) { return JSON.stringify(req.body) })
 
 
 app.use(morgan(':person :method :url :response-time'))
-let persons = [
-    {
-      id: 1,
-      name: "Ada",
-      number: "028392480",
-      
-    },
-    {
-      id: 2,
-      name: "Jim Johnson",
-      number: "02304328349",
-     
-    },
-    {
-      id: 3,
-      name: "joe jimson",
-      number: "32084423904",
-      
-    }
-  ]
+
 
   let numberofentries = Person.length - 1
   let date = new Date()
