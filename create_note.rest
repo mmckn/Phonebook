@@ -1,9 +1,9 @@
-delete https://cryptic-fortress-05104.herokuapp.com/api/persons/5fb29aa66bdecc0017444835
+get http://localhost:3001/api/persons/info
 Content-Type: application/json
 
 {
-    "content":"on",
-    "name":"Jo Joe",
+   
+    "name":" Joe",
     "phoneNumber": "0289458791"
     
 }

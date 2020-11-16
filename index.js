@@ -12,19 +12,41 @@ const url =''
 
 app.use(express.static('build'))
 
+app.use(express.json())
 
-console.log(fetch)
 
 const Person = require('./models/person')
 
 //allows our frontend app to access this server
-const cors = require('cors')
+const cors = require('cors');
+const e = require('express');
+const { nextTick } = require('process');
+const { notEqual } = require('assert');
 app.use(cors())
+
+//If user enters an unkown URL display this
+const unknownEndpoint = ( request, response) => {
+  response.status(404).send({ error: 'unknown endpoint'})
+}
+
+app.use(unknownEndpoint)
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+  //if error is castError then it is an invalid object id for mongoDb
+  if(error.name === 'CastError') {
+    return response.status(400).send({error: "id formatted incorrectly"})
+  }
+  //if it is not then pass it to the default error handler
+  next(error)
+}
+
+app.use(errorHandler)
 
 
 //json parser takse JSON date of a request and converts it to JavaScript
 //and attaches it to request.body
-app.use(express.json())
+
 
 //create a new morgan token that gets the request.body
 morgan.token('person', function (req, res) { return JSON.stringify(req.body) })
@@ -42,10 +64,6 @@ app.use(morgan(':person :method :url :response-time'))
   let numberofentries = Person.length - 1
   let date = new Date()
 
-  app.get('/', (request, response) =>{
-      response.send('<h1>Hello World!</h1>')
-  })
-
   app.get('/api/persons', (request, response) => {
     console.log('hello')
      Person.find({}).then(people =>{
@@ -60,21 +78,32 @@ ${date} `)
   })
 
   //get an entry from the phonebook by id
-  app.get('/api/persons/:id', (request, response) =>{
-    Person.findById(request.params.id).then(person => {
+  app.get('/api/persons/:id', (request, response, next) =>{
+    Person.findById(request.params.id)
+    .then(person => {
+      if(person){
       response.json(person)
-    })
+      }
+      else{
+        response.status(404).end()
+      }
+    }
+    )
+    .catch(error => 
+      next(error)
+    )
   }
   )
 
 //delete an entry from the phonebook
-  app.delete('/api/persons/:id', (request, response) => {
+  app.delete('/api/persons/:id', (request, response, next) => {
     
     
     Person.findByIdAndDelete(request.params.id).then( result => {
  
     response.status(204).end()
     })
+    .catch(error => next(error))
   })
 
 
@@ -109,7 +138,20 @@ ${date} `)
       })
     }*/
 
+app.put('api/persons/:id', (request, response) => {
+  const body = request.body
 
+  const person = {
+name: body.name,
+phoneNumber: body.number
+  }
+
+  Person.findByIdAndUpdate(request.params.id, person, {new: true})
+  .then(updatedPerson =>{
+    response.json(updatedPerson)
+  })
+  .catch(error => next(error))
+})
     
   
   
