@@ -69,9 +69,9 @@ ${date} `)
 
 //delete an entry from the phonebook
   app.delete('/api/persons/:id', (request, response) => {
-    const id = request.params.id
-    console.log(id)
-    Person.findByIdAndDelete(id).then( result => {
+    
+    
+    Person.findByIdAndDelete(request.params.id).then( result => {
  
     response.status(204).end()
     })
@@ -85,15 +85,16 @@ ${date} `)
     const body = request.body
 
     console.log(body)
-    if(body.content === undefined){
+    if(body.name === undefined){
       return response.status(400).json({
         
-        error: 'content missing'
+        error: 'name missing'
       })
     }
     const person = new Person({
+    
       name:body.name,
-      phoneNumber: body.phoneNumber
+      phoneNumber: body.number
     })
 
     person.save().then(savedPerson => {

@@ -1,4 +1,4 @@
-post https://cryptic-fortress-05104.herokuapp.com/api/persons
+delete https://cryptic-fortress-05104.herokuapp.com/api/persons/5fb29aa66bdecc0017444835
 Content-Type: application/json
 
 {
