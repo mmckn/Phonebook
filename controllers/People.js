@@ -1,16 +1,20 @@
 
 const peopleRouter = require('express').Router()
 
+
 const Person = require('../models/person')
 
 let numberofentries = Person.length - 1
 let date = new Date()
 
-peopleRouter.get('/', (request, response) => {
-  console.log('hello')
-  Person.find({}).then(people => {
-    response.json(people)
-  })
+peopleRouter.get('/', async (request, response) => {
+
+  const foundPerson = await Person.find({})
+  response.json(foundPerson)
+  
+
+
+
 })
 
 peopleRouter.get('/info', (request, response) => {
@@ -20,38 +24,38 @@ ${date} `)
 })
 
 //get an entry from the phonebook by id
-peopleRouter.get('/:id', (request, response, next) => {
-  Person.findById(request.params.id)
-    .then(person => {
-      if(person){
-        response.json(person)
-      }
-      else{
-        response.status(404).end()
-      }
-    }
-    )
-    .catch(error =>  next(error)
-    )
+peopleRouter.get('/:id', async (request, response) => {
+ 
+ 
+  const records = await Person.findById(request.params.id)
+   
+      
+  response.json(records)
 }
+    
+    
 )
+  
+    
+
+
 
 //delete an entry from the phonebook
-peopleRouter.delete('/:id', (request, response, next) => {
+peopleRouter.delete('/:id', async (request, response) => {
 
 
-  Person.findByIdAndDelete(request.params.id).then( result => {
+  const result = await Person.findByIdAndDelete(request.params.id)
 
-    response.status(204).end()
-  })
-    .catch(error => next(error))
+  response.status(204).end()
+  
+   
 })
 
 
 
 
 //add a new entry to the phonebook
-peopleRouter.post('/', (request, response, next) => {
+peopleRouter.post('/', async (request, response) => {
   const body = request.body
 
 
@@ -61,16 +65,14 @@ peopleRouter.post('/', (request, response, next) => {
     phoneNumber: body.number
   })
 
-  person.save()
-
-    .then(savedPerson => {
-      response.json(savedPerson.toJSON())
-    })
-    .catch( error => next(error))
+  const savedPerson = await person.save()  
+  response.json(savedPerson.toJSON())
+    
 })
 
 //Update an entry
-peopleRouter.put('/:id', (request, response, next) => {
+peopleRouter.put('/:id', async (request, response) => {
+
   const body = request.body
   console.log(body)
   const person = {
@@ -78,11 +80,11 @@ peopleRouter.put('/:id', (request, response, next) => {
     phoneNumber: body.number,
   }
 
-  Person.findByIdAndUpdate(request.params.id, person, { new: true })
-    .then(updatedPerson => {
-      response.json(updatedPerson.toJSON())
-    })
-    .catch(error => next(error))
+  const updatedPerson = await Person.findByIdAndUpdate(request.params.id, person, { new: true })
+    
+  response.json(updatedPerson.toJSON())
+    
+    
 })
 
 module.exports = peopleRouter
