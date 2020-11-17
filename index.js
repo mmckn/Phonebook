@@ -1,142 +1,18 @@
 
 
-const express = require('express')
-const morgan = require('morgan')
-const app = express()
-
-require('dotenv').config()
-const Person = require('./models/person')
-const cors = require('cors');
-app.use(cors())
-
-app.use(express.json())
-app.use(express.static('build'))
-
-//json parser takse JSON date of a request and converts it to JavaScript
-//and attaches it to request.body
 
 
-//create a new morgan token that gets the request.body
-morgan.token('person', function (req, res) { return JSON.stringify(req.body) })
+const app = require('./app')
+const http = require('http')
+
+const config = require('./utils/config')
+const logger = require('./utils/logger')
+const server = http.createServer(app)
 
 
-
-
-
-
-
-
-app.use(morgan(':person :method :url :response-time'))
-
-
-  let numberofentries = Person.length - 1
-  let date = new Date()
-
-  app.get('/api/persons', (request, response) => {
-    console.log('hello')
-     Person.find({}).then(people =>{
-       response.json(people)
-     })
-  })
-
-  app.get('/api/persons/info', (request, response) => {
-response.send(`Phonebook has info for ${numberofentries} people. <br>
-<br>
-${date} `)
-  })
-
-  //get an entry from the phonebook by id
-  app.get('/api/persons/:id', (request, response, next) =>{
-    Person.findById(request.params.id)
-    .then(person => {
-      if(person){
-      response.json(person)
-      }
-      else{
-        response.status(404).end()
-      }
-    }
-    )
-    .catch(error =>  next(error)
-    )
-  }
-  )
-
-//delete an entry from the phonebook
-  app.delete('/api/persons/:id', (request, response, next) => {
-    
-    
-    Person.findByIdAndDelete(request.params.id).then( result => {
- 
-    response.status(204).end()
-    })
-    .catch(error => next(error))
-  })
-
-
-
-
-  //add a new entry to the phonebook
-  app.post('/api/persons', (request, response, next) => {
-    const body = request.body
-
-  
-    const person = new Person({
-    
-      name:body.name,
-      phoneNumber: body.number
-    })
-
-    person.save()
-    
-    .then(savedPerson => {
-      response.json(savedPerson)
-    })
-    .catch( error => next(error))
-  })
-
-
-app.put('/api/persons/:id', (request, response, next) => {
-  const body = request.body
-console.log(body)
-  const person = {
-name: body.name,
-phoneNumber: body.number,
-  }
-
-  Person.findByIdAndUpdate(request.params.id, person, {new: true})
-  .then(updatedPerson =>{
-    response.json(updatedPerson)
-  })
-  .catch(error => next(error))
+server.listen(config.PORT || 3001, () => {
+  logger.info(`server running on ${config.PORT}`)
 })
-    
 
-//If user enters an unkown URL display this
-const unknownEndpoint = ( request, response) => {
-  response.status(404).send({ error: 'unknown endpoint'})
-}
 
-app.use(unknownEndpoint)
-
-const errorHandler = (error, request, response, next) => {
-  console.error(error.message)
-  //if error is castError then it is an invalid object id for mongoDb
-  if(error.name === 'CastError') {
-    return response.status(400).send({ error: "id formatted incorrectly" })
-  } else if (error.name === 'ValidationError') {
-    return response.status(400).json({ error: error.message })
-  }
-  
-  //if it is not then pass it to the default error handler
-  next(error)
-}
-
-app.use(errorHandler)
-
-  
-  const PORT = process.env.PORT || 3001
-  app.listen(PORT, () => {
-      console.log(`server running on ${PORT}`)
-  })
 

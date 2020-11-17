@@ -6,9 +6,8 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:ui":"rm -rf build && cd ../thephonebook && npm run build --prod && cp -r build ../Phonebook2/",
+    "build:ui": "rm -rf build && cd ../thephonebook && npm run build --prod && cp -r build ../Phonebook2/",
     "deploy": "git push heroku master"
-
   },
   "author": "",
   "license": "ISC",
@@ -23,6 +22,7 @@
     "node-fetch": "^2.6.1"
   },
   "devDependencies": {
+    "eslint": "^7.13.0",
     "nodemon": "^2.0.6"
   }
 }
