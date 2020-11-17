@@ -2,7 +2,7 @@
 
 
 
-const app = require('./app')
+const app = require('./App')
 const http = require('http')
 
 const config = require('./utils/config')
