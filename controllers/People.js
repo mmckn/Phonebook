@@ -25,9 +25,13 @@ ${date} `)
 //get an entry from the phonebook by id
 peopleRouter.get('/:id', async (request, response) => {
 
-  const records = await Person.findById(request.params.id)
-
-  response.json(records)
+  const record = await Person.findById(request.params.id)
+if(record){
+  response.json(record.toJSON())
+}
+else{
+  response.status(404).end()
+}
 })
 
 
@@ -37,7 +41,6 @@ peopleRouter.delete('/:id', async (request, response) => {
   const result = await Person.findByIdAndDelete(request.params.id)
 
   response.status(204).end()
-
 
 })
 

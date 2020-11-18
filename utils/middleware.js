@@ -20,15 +20,16 @@ const unknownEndpoint = ( request, response) => {
   
 const errorHandler = (error, request, response, next) => {
   logger.error(error.message)
+  
   //if error is castError then it is an invalid object id for mongoDb
-  if(error.name === 'CastError') {
+  if(error.name === 'CastError' && error.kind === 'ObjectId') {
     return response.status(400).send({ error: 'id formatted incorrectly' })
   } else if (error.name === 'ValidationError') {
     return response.status(400).json({ error: error.message })
   }
   
   //if it is not then pass it to the default error handler
-  next(error)
+  next(error) 
 }
   
 
